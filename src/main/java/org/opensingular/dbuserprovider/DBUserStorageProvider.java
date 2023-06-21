@@ -182,6 +182,12 @@ public class DBUserStorageProvider implements UserStorageProvider,
             
             log.infov("lookup user by username roles " + center_admin +"," +parent+"," +professional+"," +teacher+"," +admin);
             
+            user.deleteRoleMapping(getRoleFromString(realm, this.client, this.role_teacher));
+            user.deleteRoleMapping(getRoleFromString(realm, this.client, this.role_parent));
+            user.deleteRoleMapping(getRoleFromString(realm, this.client, this.role_professional));
+            user.deleteRoleMapping(getRoleFromString(realm, this.client, this.role_center_admin));
+            user.deleteRoleMapping(getRoleFromString(realm, this.client, this.role_admin));
+            
             if (teacher)
             	user.grantRole(getRoleFromString(realm, this.client, this.role_teacher));
             if (parent)
