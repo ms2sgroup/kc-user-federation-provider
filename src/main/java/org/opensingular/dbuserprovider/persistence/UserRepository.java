@@ -166,4 +166,11 @@ public class UserRepository {
     public boolean removeUser() {
         return queryConfigurations.getAllowKeycloakDelete();
     }
+    
+    public Map<String, String> findRolesByUser(String username) {
+	
+       return   Optional.ofNullable(doQuery("select is_center_admin, is_parent, is_professional, is_teacher, is_staff from atenxia_user where is_active = true and username=?", null, this::readMap, username)).orElse(Collections.emptyList())
+               .stream().findFirst().orElse(null);
+        
+    }
 }

@@ -11,6 +11,7 @@ import org.keycloak.component.ComponentModel;
 import org.keycloak.credential.CredentialInput;
 import org.keycloak.credential.CredentialInputUpdater;
 import org.keycloak.credential.CredentialInputValidator;
+import org.keycloak.models.ClientModel;
 import org.keycloak.models.GroupModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
@@ -40,6 +41,14 @@ public class DBUserStorageProvider implements UserStorageProvider,
     private final ComponentModel  model;
     private final UserRepository  repository;
     private final boolean allowDatabaseToOverwriteKeycloak;
+    
+    private final String role_teacher = "TEACHER";
+    private final String role_professional = "PROFESSIONAL";
+    private final String role_admin = "ADMIN";
+    private final String role_parent="PARENT";
+    private final String role_center_admin="CENTER_ADMIN";
+    
+    private final String client = "client-atenxia";
 
     DBUserStorageProvider(KeycloakSession session, ComponentModel model, DataSourceProvider dataSourceProvider, QueryConfigurations queryConfigurations) {
         this.session    = session;
@@ -160,9 +169,66 @@ public class DBUserStorageProvider implements UserStorageProvider,
     public UserModel getUserByUsername(String username, RealmModel realm) {
         
         log.infov("lookup user by username: realm={0} username={1}", realm.getId(), username);
+        UserModel user = repository.findUserByUsername(username).map(u -> new UserAdapter(session, realm, model, u, allowDatabaseToOverwriteKeycloak)).orElse(null);
+        	
+        Map<String, String> roles = repository.findRolesByUser(username); 
+        if(!roles.isEmpty())
+        {
+            boolean center_admin = (roles.get("is_center_admin").equals("t")) ? true:false;
+            boolean parent = (roles.get("is_parent").equals("t")) ? true:false;
+            boolean professional = (roles.get("is_professional").equals("t")) ? true:false;
+            boolean teacher = (roles.get("is_teacher").equals("t")) ? true:false;
+            boolean admin = (roles.get("is_staff").equals("t")) ? true:false;
+            
+            log.infov("lookup user by username roles " + center_admin +"," +parent+"," +professional+"," +teacher+"," +admin);
+            
+            if (teacher)
+            	user.grantRole(getRoleFromString(realm, this.client, this.role_teacher));
+            if (parent)
+            	user.grantRole(getRoleFromString(realm, this.client, this.role_parent));
+            if (professional)
+            	user.grantRole(getRoleFromString(realm, this.client, this.role_professional));
+            if (center_admin)
+            	user.grantRole(getRoleFromString(realm, this.client, this.role_center_admin));
+            if (admin)
+            	user.grantRole(getRoleFromString(realm, this.client, this.role_admin));
+        }
         
-        return repository.findUserByUsername(username).map(u -> new UserAdapter(session, realm, model, u, allowDatabaseToOverwriteKeycloak)).orElse(null);
+        return user;
     }
+    
+    private RoleModel getRoleFromString(RealmModel realm, String clientId, String roleName) {
+	log.infov("getRoleFromString " + roleName);
+	RoleModel role = null;
+        ClientModel client = realm.getClientByClientId(clientId);
+        if (client != null) {
+        	try
+                {
+        	    role = client.getRole(roleName);
+                }
+                catch(Exception e)
+                {
+            	
+                }
+        }
+        
+        return role;
+    }
+    
+    // Used for hardcoded role mappers
+    /*private String[] parseRole(String role) {
+        int scopeIndex = role.lastIndexOf('.');
+        if (scopeIndex > -1) {
+            String appName = role.substring(0, scopeIndex);
+            role = role.substring(scopeIndex + 1);
+            String[] rtn = {appName, role};
+            return rtn;
+        } else {
+            String[] rtn = {null, role};
+            return rtn;
+
+        }
+    }*/
     
     @Override
     public UserModel getUserByEmail(String email, RealmModel realm) {

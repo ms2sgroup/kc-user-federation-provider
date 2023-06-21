@@ -1,13 +1,5 @@
 package org.opensingular.dbuserprovider.model;
 
-import lombok.extern.jbosslog.JBossLog;
-import org.apache.commons.lang3.StringUtils;
-import org.keycloak.component.ComponentModel;
-import org.keycloak.models.KeycloakSession;
-import org.keycloak.models.RealmModel;
-import org.keycloak.storage.StorageId;
-import org.keycloak.storage.adapter.AbstractUserAdapterFederatedStorage;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -16,11 +8,21 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+import org.keycloak.component.ComponentModel;
+import org.keycloak.models.KeycloakSession;
+import org.keycloak.models.RealmModel;
+import org.keycloak.storage.StorageId;
+import org.keycloak.storage.adapter.AbstractUserAdapterFederatedStorage;
+
+import lombok.extern.jbosslog.JBossLog;
+
 @JBossLog
 public class UserAdapter extends AbstractUserAdapterFederatedStorage {
 
     private final String keycloakId;
     private       String username;
+    
 
     public UserAdapter(KeycloakSession session, RealmModel realm, ComponentModel model, Map<String, String> data, boolean allowDatabaseToOverwriteKeycloak) {
         super(session, realm, model);
@@ -59,6 +61,5 @@ public class UserAdapter extends AbstractUserAdapterFederatedStorage {
     public void setUsername(String username) {
         this.username = username;
     }
-
 
 }
