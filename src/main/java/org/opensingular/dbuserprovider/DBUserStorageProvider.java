@@ -245,6 +245,14 @@ public class DBUserStorageProvider implements UserStorageProvider,
     }
     
     @Override
+    public UserModel getUserByEmail(RealmModel realm, String email) {
+        
+        log.infov("lookup user by username: realm={0} email={1}", realm.getId(), email);
+        
+        return getUserByUsername(email, realm);
+    }
+    
+    @Override
     public int getUsersCount(RealmModel realm) {
         return repository.getUsersCount(null);
     }
