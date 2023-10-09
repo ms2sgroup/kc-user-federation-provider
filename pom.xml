@@ -132,7 +132,7 @@
     </dependencies>
 
 
-    <build>
+    <!--<build>
         <finalName>singular-user-storage-provider</finalName>
         <plugins>
             <plugin>
@@ -167,7 +167,22 @@
                 </configuration>
             </plugin>
         </plugins>
-    </build>
+    </build>-->
+	
+	<build>
+        <finalName>singular-user-storage-provider</finalName>
+        <plugins>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <configuration>
+          <descriptorRefs>
+            <descriptorRef>jar-with-dependencies</descriptorRef>
+          </descriptorRefs>
+        </configuration>
+      </plugin>
+    </plugins>
+</build>
+
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -176,7 +191,7 @@
 
         <lombok.version>1.18.22</lombok.version>
         <jboss-logging.version>3.3.1.Final</jboss-logging.version>
-        <keycloak.version>17.0.1</keycloak.version>
+        <keycloak.version>22.0.4</keycloak.version>
         <auto-service.version>1.0-rc5</auto-service.version>
         <jboss.home>target/keycloak</jboss.home>
     </properties>
